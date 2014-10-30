@@ -1,6 +1,6 @@
 package com.vectorwing.games.minesweeper.enums;
 
-public enum EnumGameState {
+public enum GameState {
 	
 	PRE_GAME,
 	PLAYING,

@@ -1,20 +1,23 @@
 package com.vectorwing.games.minesweeper.widgets;
 
-import com.vectorwing.games.minesweeper.enums.EnumGameDifficulty;
-import com.vectorwing.games.minesweeper.enums.EnumGameState;
+import com.vectorwing.games.minesweeper.enums.GameDifficulty;
+import com.vectorwing.games.minesweeper.enums.GameState;
 
 public class TileGrid {
 	
-	private EnumGameState state;
+	private GameState state;
 	
 	private int tile_width;
 	private int tile_height;
 	private int amount_x;
 	private int amount_y;
+	private int amount_mines;
 	
 	public TileGrid()
 	{
-		
+		tile_width = 16;
+		tile_height = 16;
+		startGame(GameDifficulty.EASY);
 	}
 	
 	/**
@@ -25,12 +28,24 @@ public class TileGrid {
 	 */
 	public void startGame(int amount_x, int amount_y, int amount_mines)
 	{
-		// TODO: Initialize an array of Tile objects, using args as X and Y amounts.
+		this.amount_x = amount_x;
+		this.amount_y = amount_y;
+		this.amount_mines = amount_mines;
+		
+		// TODO: GameState PREGAME - Reset all tiles, lay down mines, lay down hints, make sure none overlap.
+		this.state = GameState.PRE_GAME;
 	}
 	
-	public void startGame(EnumGameDifficulty difficulty)
+	/**
+	 * Starts a game using default parameters from a difficulty level defined in EnumGameDifficulty.
+	 * @param difficulty
+	 */
+	public void startGame(GameDifficulty difficulty)
 	{
-		
+		// TODO: Initialize an array of Tile objects, using args from given Enum.
+		this.amount_x = difficulty.amount_x;
+		this.amount_y = difficulty.amount_y;
+		this.amount_mines = difficulty.amount_mines;
 	}
 
 }
