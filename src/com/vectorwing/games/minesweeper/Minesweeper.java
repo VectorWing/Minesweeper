@@ -29,9 +29,8 @@ public class Minesweeper extends JFrame {
 	{
 		this.setTitle(Names.GAME_TITLE + " " + Names.GAME_VERSION);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setResizable(false);
 		this.setLocationRelativeTo(null);
-		System.out.println(this.getPreferredSize());
+		this.setResizable(false);
 	}
 	
 	private void initWindowLayout()
@@ -39,10 +38,10 @@ public class Minesweeper extends JFrame {
 		this.main = new MainGUI();
 		this.setContentPane(this.main);
 		
-		this.pack();
 		this.main.getTileGrid().newGame(GameLevel.EASY, this);
 		this.main.getGameInfo().setParameters(GameLevel.EASY);
 		this.main.getGameInfo().setClear();
+		this.pack();
 	}
 
 	public static void main(String[] args) {

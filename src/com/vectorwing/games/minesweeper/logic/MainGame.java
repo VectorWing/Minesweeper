@@ -23,16 +23,18 @@ import com.vectorwing.games.minesweeper.reference.Measures;
  */
 public class MainGame {
 	
-	private MainGUI		gui;
+	private MainGUI			gui;
 	private GameLevel		level;
 	private GameState		state;
+	
+	private int[][]			tile_content;
 	
 	private int				qt_tile_x;
 	private int				qt_tile_y;
 	private int				qt_mines;
 	private boolean			custom;
 	
-	private BufferedImage[]				img_tile;
+	private BufferedImage[]	img_tile;
 	
 	public MainGame(MainGUI gui, GameLevel default_level)
 	{
@@ -57,13 +59,12 @@ public class MainGame {
 		
 		this.qt_tile_x = (qt_tile_x > Measures.MAX_TILE_X) ? Measures.MAX_TILE_X : qt_tile_x;
 		this.qt_tile_y = (qt_tile_y > Measures.MAX_TILE_Y) ? Measures.MAX_TILE_Y : qt_tile_y;
-		int max_mines = (int) Math.floor(0.60 * (qt_tile_x * qt_tile_y));
+		int max_mines = (int) Math.floor(Measures.MAX_TILE_MINES * (qt_tile_x * qt_tile_y));
 		this.qt_mines = (qt_mines > max_mines) ? max_mines : qt_mines;
 	}
 	
 	public void begin()
 	{
-		// TODO Distribute tiles on GUI's TileGrid
 		this.state = GameState.PRE_GAME;
 		
 		GridBagConstraints gbc = new GridBagConstraints();
