@@ -16,7 +16,7 @@ import com.vectorwing.games.minesweeper.reference.Names;
 public class Minesweeper extends JFrame {
 
 	private static final long	serialVersionUID = 1L;
-	private MainGUI				main;
+	private MainGUI				gui;
 	private MainGame			game;
 	
 	public Minesweeper()
@@ -35,12 +35,12 @@ public class Minesweeper extends JFrame {
 	
 	private void initWindowLayout()
 	{
-		this.main = new MainGUI();
-		this.setContentPane(this.main);
+		this.gui = new MainGUI();
+		this.setContentPane(this.gui);
 		
-		this.main.getTileGrid().newGame(GameLevel.EASY, this);
-		this.main.getGameInfo().setParameters(GameLevel.EASY);
-		this.main.getGameInfo().setClear();
+		this.gui.getTileGrid().newGame(GameLevel.EASY, this);
+		this.gui.getGameInfo().setParameters(GameLevel.EASY);
+		this.gui.getGameInfo().setClear();
 		this.pack();
 	}
 

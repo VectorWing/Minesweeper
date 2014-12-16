@@ -33,6 +33,7 @@ public class MainGame {
 	
 	private ArrayList<ArrayList<Integer>>	tile_content;
 	private ArrayList<Point>				mine_coords;
+	private ArrayList<ArrayList<Boolean>>	list_mines;
 	
 	private int								qt_tile_x;
 	private int								qt_tile_y;
@@ -116,24 +117,24 @@ public class MainGame {
 			}
 			
 			if (row > 0) {
-				this.tile_array.get(row-1).get(col).addAdjacentMine();
+				this.tile_content.get(row-1).set(col, this.tile_content.get(row-1).get(col) + 1);
 				if (col > 0) 
-					this.tile_array.get(row-1).get(col-1).addAdjacentMine();
+					this.tile_content.get(row-1).set(col-1, this.tile_content.get(row-1).get(col-1) + 1);
 				if (col < qt_tile_x-1)
-					this.tile_array.get(row-1).get(col+1).addAdjacentMine();
+					this.tile_content.get(row-1).set(col+1, this.tile_content.get(row-1).get(col+1) + 1);
 			}
 			if (row < qt_tile_y-1) {
-				this.tile_array.get(row+1).get(col).addAdjacentMine();
+				this.tile_content.get(row+1).set(col, this.tile_content.get(row-1).get(col) + 1);
 				if (col > 0)
-					this.tile_array.get(row+1).get(col-1).addAdjacentMine();
+					this.tile_content.get(row+1).set(col-1, this.tile_content.get(row-1).get(col-1) + 1);
 				if (col < qt_tile_x-1)
-					this.tile_array.get(row+1).get(col+1).addAdjacentMine();
+					this.tile_content.get(row+1).set(col+1, this.tile_content.get(row-1).get(col+1) + 1);
 			}
 			if (col > 0) {
-				this.tile_array.get(row).get(col-1).addAdjacentMine();
+				this.tile_content.get(row).set(col-1, this.tile_content.get(row-1).get(col-1) + 1);
 			}
 			if (col < qt_tile_x-1) {
-				this.tile_array.get(row).get(col+1).addAdjacentMine();
+				this.tile_content.get(row).set(col+1, this.tile_content.get(row-1).get(col+1) + 1 );
 			}
 		}
 	}
