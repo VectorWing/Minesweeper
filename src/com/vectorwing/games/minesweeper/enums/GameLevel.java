@@ -10,22 +10,22 @@ public enum GameLevel {
 	HARD(30, 16, 99),
 	CUSTOM;
 	
-	public int amount_x;
-	public int amount_y;
-	public int amount_mines;
+	public int qt_tiles_x;
+	public int qt_tiles_y;
+	public int qt_mines;
 	
 	GameLevel()
 	{
-		this.amount_x = 0;
-		this.amount_y = 0;
-		this.amount_mines = 0;
+		this.qt_tiles_x = 0;
+		this.qt_tiles_y = 0;
+		this.qt_mines = 0;
 	}
 	
 	GameLevel(int amount_x, int amount_y, int amount_mines)
 	{
-		this.amount_x = amount_x;
-		this.amount_y = amount_y;
-		this.amount_mines = amount_mines;
+		this.qt_tiles_x = amount_x;
+		this.qt_tiles_y = amount_y;
+		this.qt_mines = amount_mines;
 	}
 	
 }

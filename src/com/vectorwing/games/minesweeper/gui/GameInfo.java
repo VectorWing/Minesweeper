@@ -86,9 +86,9 @@ public class GameInfo extends JPanel {
 	}
 	
 	public void setParameters(GameLevel diff) {
-		this.amount_mines = diff.amount_mines;
+		this.amount_mines = diff.qt_mines;
 		this.amount_tiles = 0;
-		this.total_tiles = diff.amount_x*diff.amount_y-diff.amount_mines;
+		this.total_tiles = diff.qt_tiles_x*diff.qt_tiles_y-diff.qt_mines;
 		
 		this.show_mines.setText(amount_mines + MSG_MINES);
 		this.show_tiles.setText(amount_tiles +"/"+ total_tiles + MSG_TILES);

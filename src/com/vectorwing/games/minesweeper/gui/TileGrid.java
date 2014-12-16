@@ -140,9 +140,9 @@ public class TileGrid extends JPanel {
 		this.level = difficulty;	
 		this.mine_coords = new ArrayList<Point>();
 		
-		this.amount_x = difficulty.amount_x;
-		this.amount_y = difficulty.amount_y;
-		this.amount_mines = difficulty.amount_mines;
+		this.amount_x = difficulty.qt_tiles_x;
+		this.amount_y = difficulty.qt_tiles_y;
+		this.amount_mines = difficulty.qt_mines;
 		
 		this.startGame();
 		frame.pack();

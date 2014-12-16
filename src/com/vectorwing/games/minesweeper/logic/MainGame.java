@@ -3,10 +3,12 @@ package com.vectorwing.games.minesweeper.logic;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 
@@ -23,16 +25,19 @@ import com.vectorwing.games.minesweeper.reference.Measures;
  */
 public class MainGame {
 	
-	private MainGUI			gui;
-	private GameLevel		level;
-	private GameState		state;
+	public static final int MINE = -1;
 	
-	private int[][]			tile_content;
+	private MainGUI							gui;
+	private GameLevel						level;
+	private GameState						state;
 	
-	private int				qt_tile_x;
-	private int				qt_tile_y;
-	private int				qt_mines;
-	private boolean			custom;
+	private ArrayList<ArrayList<Integer>>	tile_content;
+	private ArrayList<Point>				mine_coords;
+	
+	private int								qt_tile_x;
+	private int								qt_tile_y;
+	private int								qt_mines;
+	private boolean							custom;
 	
 	private BufferedImage[]	img_tile;
 	
@@ -47,9 +52,9 @@ public class MainGame {
 		this.custom = false;
 		this.level = level;
 		
-		this.qt_tile_x = level.amount_x;
-		this.qt_tile_y = level.amount_y;
-		this.qt_mines = level.amount_mines;
+		this.qt_tile_x = level.qt_tiles_x;
+		this.qt_tile_y = level.qt_tiles_y;
+		this.qt_mines = level.qt_mines;
 	}
 	
 	public void setCustomGame(int qt_tile_x, int qt_tile_y, int qt_mines)
@@ -90,6 +95,54 @@ public class MainGame {
 		// TODO Distribute mines across TileGrid and increment surrounding hints
 	}
 	
+	private void deployMines(Point first_click)
+	{
+		for (int i = 0; i < qt_mines; i++)
+		{
+			int row = randomInt(0, qt_tile_y);
+			int col = randomInt(0, qt_tile_x);
+			if (this.tile_content.get(row).get(col) != MINE)
+			{
+				if (row == first_click.getY() && col == first_click.getX()) {
+					i -= 1;
+					continue;
+				} else {
+					this.tile_content.get(row).set(col, MINE);
+					this.mine_coords.add(new Point(col, row));
+				}
+			} else {
+				i -= 1;
+				continue;
+			}
+			
+			if (row > 0) {
+				this.tile_array.get(row-1).get(col).addAdjacentMine();
+				if (col > 0) 
+					this.tile_array.get(row-1).get(col-1).addAdjacentMine();
+				if (col < qt_tile_x-1)
+					this.tile_array.get(row-1).get(col+1).addAdjacentMine();
+			}
+			if (row < qt_tile_y-1) {
+				this.tile_array.get(row+1).get(col).addAdjacentMine();
+				if (col > 0)
+					this.tile_array.get(row+1).get(col-1).addAdjacentMine();
+				if (col < qt_tile_x-1)
+					this.tile_array.get(row+1).get(col+1).addAdjacentMine();
+			}
+			if (col > 0) {
+				this.tile_array.get(row).get(col-1).addAdjacentMine();
+			}
+			if (col < qt_tile_x-1) {
+				this.tile_array.get(row).get(col+1).addAdjacentMine();
+			}
+		}
+	}
+	
+	public static int randomInt(int min, int max) {
+		int randomNum = new Random().nextInt((max - min)) + min;
+	    return randomNum;
+	}
+	
 	class TileMouseAdapter extends MouseAdapter
 	{
 		private Tile tile;
@@ -116,7 +169,7 @@ public class MainGame {
 	       		}
 	       		if (e.getButton() == MouseEvent.BUTTON1) {
 	       			//updateLogic(tile);
-	       			//info.setParameters(amount_mines, total_triggered, 0);
+	       			//info.setParameters(qt_mines, total_triggered, 0);
 	       		} else {
 	       			tile.toggleFlag();
 	       		}
