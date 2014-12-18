@@ -77,7 +77,7 @@ public class OptionDisplayScore extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 		private List<String> columnNames = new ArrayList<String>();
-	    private List<List> data = new ArrayList<List>();
+	    private List<List<?>> data = new ArrayList<List<?>>();
 	    
 	    {
 	    	columnNames.add("Jogador");

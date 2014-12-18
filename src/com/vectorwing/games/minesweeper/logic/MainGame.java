@@ -7,19 +7,23 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.Timer;
 
+import com.vectorwing.games.minesweeper.data.Spritesheet;
 import com.vectorwing.games.minesweeper.enums.GameLevel;
 import com.vectorwing.games.minesweeper.enums.GameState;
 import com.vectorwing.games.minesweeper.enums.TileState;
 import com.vectorwing.games.minesweeper.gui.MainGUI;
 import com.vectorwing.games.minesweeper.gui.Tile;
 import com.vectorwing.games.minesweeper.gui.Tile.TileFrame;
+import com.vectorwing.games.minesweeper.reference.Filepath;
 import com.vectorwing.games.minesweeper.reference.Measures;
 
 /**
@@ -43,11 +47,12 @@ public class MainGame {
 	private int								qt_tile_y;
 	private int								qt_mines;
 	private int								count_flags;
-	private Timer							count_time;
+	//private Timer							count_time;
 	private int								count_triggered;
 	private boolean							custom;
 	
-	private BufferedImage[]	img_tile;
+	private Spritesheet						img_tile;
+	private ArrayList<String>				key_tile;
 	
 	public MainGame(MainGUI gui, GameLevel default_level)
 	{
@@ -56,6 +61,47 @@ public class MainGame {
 		
 		this.list_mines = new ArrayList<ArrayList<Boolean>>();
 		this.list_hints = new ArrayList<ArrayList<Integer>>();
+		this.initGraphics();
+	}
+	
+	@SuppressWarnings("serial")
+	private void initGraphics()
+	{
+		BufferedImage buffer;
+		
+		try {
+			buffer = ImageIO.read(new File(Filepath.IMG_TILE));
+			System.out.println("Resource '" + Filepath.IMG_TILE + "' loaded succesfully.");
+		} catch (IOException e) {
+			System.out.println("ERROR: Failed to load a resource!");
+			buffer = null;
+		}
+		
+		this.key_tile = new ArrayList<String>() {{
+			add("SPACE_EMPTY");
+			add("SPACE_1");
+			add("SPACE_2");
+			add("SPACE_3");
+			add("SPACE_4");
+			add("SPACE_MINE");
+			add("SPACE_5");
+			add("SPACE_6");
+			add("SPACE_7");
+			add("SPACE_8");
+			add("TILE_NORMAL");
+			add("TILE_FLAG");
+			add("TILE_QUESTION");
+			add("TILE_CLICKING");
+			add("ERROR");
+		}};
+		
+		this.img_tile = new Spritesheet();
+		this.img_tile.generateSpritesFromImage(buffer, key_tile, 5, 3, 24, 24);
+	}
+	
+	public void printGameInfo()
+	{
+		System.out.println(count_flags + "/" + count_triggered);
 	}
 	
 	/** Sets one of the default game modes. Those have high-scores. **/
@@ -89,7 +135,7 @@ public class MainGame {
 		this.list_mines.clear();
 		this.list_hints.clear();
 		this.count_flags = 0;
-		this.count_flags = 0;
+		this.count_triggered = 0;
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(0, 0, 0, 0);
@@ -103,7 +149,7 @@ public class MainGame {
 			ArrayList<Tile> tilerow = new ArrayList<Tile>();
 			for (int iter_x = 0; iter_x < this.qt_tile_x; iter_x++)
 			{
-				Tile tile = new Tile(iter_x, iter_y, img_tile);
+				Tile tile = new Tile(iter_x, iter_y, img_tile.getSprite("TILE_NORMAL"));
 				tile.setPreferredSize(new Dimension(Measures.TILE_WIDTH, Measures.TILE_HEIGHT));
 				tile.addMouseListener(new TileMouseAdapter(tile));
 				tilerow.add(tile);
@@ -192,6 +238,36 @@ public class MainGame {
 	    return randomNum;
 	}
 	
+	/** Triggers the given tile, if normal and during an active game.
+	 *	This function does logic checks for victory and cascade conditions.
+	 **/
+	public void clearTile(Tile tile)
+	{
+		TileState tile_state = tile.getState();
+		if (this.state != GameState.PLAYING ||
+			this.state != GameState.PRE_GAME ||
+			tile_state != TileState.NORMAL)
+			return;
+		
+		Point coord = tile.getPosition();
+		if (list_mines.get(coord.y).get(coord.x))
+		{
+			tile.trigger();
+			this.finish(GameState.DEFEAT);
+		}
+		else
+		{
+			if (list_hints.get(coord.y).get(coord.x) == 0)
+			{
+				// TODO: Empty tile, cascade clear
+			}
+			else
+			{
+				// TODO: Hint tile, display it
+			}
+		}
+	}
+	
 	/** A MouseAdapter designed to trigger behaviors when a tile is clicked. **/
 	class TileMouseAdapter extends MouseAdapter
 	{
@@ -207,7 +283,8 @@ public class MainGame {
 			e.getButton() == MouseEvent.BUTTON1 &&
 			state != GameState.DEFEAT &&
 			state != GameState.VICTORY) {
-				tile.setIcon(new ImageIcon(img_tile[TileFrame.TILE_CLICKING.ordinal()]));
+				// TODO: Create a god damn SPRITESHEET class!
+				tile.setIcon(img_tile.getSprite("TILE_CLICKING"));
 			}
 		}
 	    public void mouseReleased(MouseEvent e) {
@@ -218,10 +295,10 @@ public class MainGame {
 	       			state = GameState.PLAYING;
 	       		}
 	       		if (e.getButton() == MouseEvent.BUTTON1) {
-	       			//updateLogic(tile);
+	       			clearTile(tile);
 	       			//info.setParameters(qt_mines, total_triggered, 0);
 	       		} else {
-	       			tile.toggleFlag();
+	       			count_flags += tile.toggleFlag();
 	       		}
 	       	}
 	    }

@@ -16,8 +16,8 @@ public class Tile extends JButton {
 	private static final long serialVersionUID = 1L;
 	
 	private Point			pos;
-	private int 			adjacent_mines;
-	private boolean 		mine;
+	private int 			adjacent_mines;		// REMOVE
+	private boolean 		mine;				// REMOVE
 	private TileState 		state;
 	private BufferedImage	tile_frames[];
 	
@@ -49,6 +49,15 @@ public class Tile extends JButton {
 		this.updateGraphics();
 	}
 	
+	public Tile(int posx, int posy, ImageIcon sprite) {
+		this.pos = new Point(posx, posy);
+		this.setIcon(sprite);
+		this.adjacent_mines = 0;
+		this.state = TileState.NORMAL;
+		this.setBorderPainted(false);
+		this.updateGraphics();
+	}
+
 	public Point getPosition()
 	{
 		return this.pos;
