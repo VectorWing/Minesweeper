@@ -22,6 +22,7 @@ import com.vectorwing.games.minesweeper.enums.GameState;
 import com.vectorwing.games.minesweeper.enums.TileState;
 import com.vectorwing.games.minesweeper.gui.MainGUI;
 import com.vectorwing.games.minesweeper.gui.Tile;
+import com.vectorwing.games.minesweeper.gui.TileGrid;
 import com.vectorwing.games.minesweeper.gui.Tile.TileFrame;
 import com.vectorwing.games.minesweeper.reference.Filepath;
 import com.vectorwing.games.minesweeper.reference.Measures;
@@ -52,7 +53,7 @@ public class MainGame {
 	private boolean							custom;
 	
 	private Spritesheet						img_tile;
-	private ArrayList<String>				key_tile;
+	private ArrayList<String>				imgkey_tile;
 	
 	public MainGame(MainGUI gui, GameLevel default_level)
 	{
@@ -77,26 +78,27 @@ public class MainGame {
 			buffer = null;
 		}
 		
-		this.key_tile = new ArrayList<String>() {{
-			add("SPACE_EMPTY");
-			add("SPACE_1");
-			add("SPACE_2");
-			add("SPACE_3");
-			add("SPACE_4");
-			add("SPACE_MINE");
-			add("SPACE_5");
-			add("SPACE_6");
-			add("SPACE_7");
-			add("SPACE_8");
-			add("TILE_NORMAL");
-			add("TILE_FLAG");
-			add("TILE_QUESTION");
-			add("TILE_CLICKING");
-			add("ERROR");
+		this.imgkey_tile = new ArrayList<String>()
+		{{
+			add("space_empty");
+			add("space_1");
+			add("space_2");
+			add("space_3");
+			add("space_4");
+			add("space_mine");
+			add("space_5");
+			add("space_6");
+			add("space_7");
+			add("space_8");
+			add("tile_normal");
+			add("tile_flag");
+			add("tile_question");
+			add("tile_clicking");
+			add("error");
 		}};
 		
 		this.img_tile = new Spritesheet();
-		this.img_tile.generateSpritesFromImage(buffer, key_tile, 5, 3, 24, 24);
+		this.img_tile.generateSpritesFromImage(buffer, imgkey_tile, 24, 24, 5, 3);
 	}
 	
 	public void printGameInfo()
@@ -179,7 +181,20 @@ public class MainGame {
 			}
 			break;
 		case DEFEAT:
-			// TODO: Display all mines and declare game over.
+			this.state = GameState.DEFEAT;
+			int x = 0;
+			int y = 0;
+			for (ArrayList<Boolean> row : list_mines)
+			{
+				x = 0;
+				for (boolean isMine : row)
+				{
+					if (isMine)
+						this.gui.getTileGrid().getTileArray().get(y).get(x).setIcon(img_tile.getSprite("space_mine"));
+					x++;
+				}
+				y++;
+			}
 			break;
 		default:
 			return;
@@ -241,7 +256,7 @@ public class MainGame {
 	/** Triggers the given tile, if normal and during an active game.
 	 *	This function does logic checks for victory and cascade conditions.
 	 **/
-	public void clearTile(Tile tile)
+	public void clearTile(Tile tile, boolean cascading)
 	{
 		TileState tile_state = tile.getState();
 		if (this.state != GameState.PLAYING ||
@@ -249,21 +264,52 @@ public class MainGame {
 			tile_state != TileState.NORMAL)
 			return;
 		
+		tile.trigger();
+		
 		Point coord = tile.getPosition();
-		if (list_mines.get(coord.y).get(coord.x))
+		if (!cascading && list_mines.get(coord.y).get(coord.x))
 		{
-			tile.trigger();
+			// All mines are displayed on game over.
 			this.finish(GameState.DEFEAT);
 		}
 		else
 		{
 			if (list_hints.get(coord.y).get(coord.x) == 0)
 			{
-				// TODO: Empty tile, cascade clear
+				tile.setIcon(img_tile.getSprite("space_empty"));
+				int x = tile.getPosition().x;
+				int y = tile.getPosition().y;
+				ArrayList<ArrayList<Tile>> grid = this.gui.getTileGrid().getTileArray();
+				
+				if (y > 0)
+				{
+					clearTile(grid.get(y-1).get(x), true);
+					if (x > 0)
+						clearTile(grid.get(y-1).get(x-1), true);
+					if (x < qt_tile_x-1)
+						clearTile(grid.get(y-1).get(x+1), true);
+				}
+				
+				if (y < qt_tile_y-1)
+				{
+					clearTile(grid.get(y+1).get(x), true);
+					if (x > 0)
+						clearTile(grid.get(y+1).get(x-1), true);
+					if (x < qt_tile_x-1)
+						clearTile(grid.get(y+1).get(x+1), true);
+				}
+				
+				if (x > 0)
+					clearTile(grid.get(y).get(x-1), true);
+					
+				if (x < qt_tile_x-1)
+					clearTile(grid.get(y).get(x+1), true);
+				
+				return;
 			}
 			else
-			{
-				// TODO: Hint tile, display it
+			{				
+				tile.setIcon(img_tile.getSprite("space_" + list_hints.get(coord.y).get(coord.x)));
 			}
 		}
 	}
@@ -280,23 +326,24 @@ public class MainGame {
 		
 		public void mousePressed(MouseEvent e) {
 			if (tile.getState() == TileState.NORMAL &&
-			e.getButton() == MouseEvent.BUTTON1 &&
-			state != GameState.DEFEAT &&
-			state != GameState.VICTORY) {
-				// TODO: Create a god damn SPRITESHEET class!
+				e.getButton() == MouseEvent.BUTTON1 &&
+				state != GameState.DEFEAT &&
+				state != GameState.VICTORY)
+			{
 				tile.setIcon(img_tile.getSprite("TILE_CLICKING"));
 			}
 		}
 	    public void mouseReleased(MouseEvent e) {
 	       	if (state != GameState.DEFEAT && state != GameState.VICTORY)
 	       	{
-	       		if (state == GameState.PRE_GAME) {
+	       		if (state == GameState.PRE_GAME)
+	       		{
 	       			deployMines(tile.getPosition());
 	       			state = GameState.PLAYING;
 	       		}
-	       		if (e.getButton() == MouseEvent.BUTTON1) {
-	       			clearTile(tile);
-	       			//info.setParameters(qt_mines, total_triggered, 0);
+	       		if (e.getButton() == MouseEvent.BUTTON1)
+	       		{
+	       			clearTile(tile, false);
 	       		} else {
 	       			count_flags += tile.toggleFlag();
 	       		}

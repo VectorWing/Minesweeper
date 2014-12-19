@@ -21,7 +21,8 @@ public class Spritesheet {
 		return sheet.get(name);
 	}
 	
-	public void addSprite(BufferedImage img, String name)
+	/** Inserts a new sprite manually, identified by the given name. **/
+	public void add(BufferedImage img, String name)
 	{
 		this.sheet.put(name, new ImageIcon(img));
 	}
@@ -33,7 +34,7 @@ public class Spritesheet {
 	 * This function will erase any and all sprites currently stored within before generation.
 	 */
 	public void generateSpritesFromImage(BufferedImage img, ArrayList<String> names,
-			int width, int height, int sprite_cols, int sprite_rows)
+			int sprite_width, int sprite_height, int sprite_cols, int sprite_rows)
 	{
 		this.sheet.clear();
 		int index = 0;
@@ -43,17 +44,15 @@ public class Spritesheet {
 		    for (int j = 0; j < sprite_cols; j++)
 		    {
 		    	String key = "";
-		    	if (names == null)
-		    		key = "sprite_" + String.valueOf(index);
-		    	else if (names.get(index) == null)
-		    		key = "sprite_" + String.valueOf(index);
+		    	
+		    	if (!names.isEmpty())
+		    		key = names.remove(0);
 		    	else
-		    		key = names.get(index);
+		    		key = "sprite_" + String.valueOf(index);
 		    		
-		    	ImageIcon icon = new ImageIcon(img.getSubimage(j * width, i * height, width, height));
+		    	ImageIcon icon = new ImageIcon(img.getSubimage(j * sprite_width, i * sprite_height, sprite_width, sprite_height));
 		    	this.sheet.put(key, icon);
 		    	index++;
-		    	//img_tile[(i * sprite_cols) + j] = buffer.getSubimage(j * sprite_width, i * sprite_height, sprite_width, sprite_height);
 		    }
 		}
 	}
