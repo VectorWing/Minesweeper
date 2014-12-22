@@ -65,10 +65,10 @@ public class MainGame {
 		this.begin();
 	}
 	
-	public void printGameInfo()
+	/*public void printGameInfo()
 	{
 		System.out.println(count_flags + "/" + count_triggered);
-	}
+	}*/
 	
 	/** Sets one of the default game modes. Those hold high-scores. **/
 	public void setNormalGame(GameLevel level)
@@ -146,7 +146,7 @@ public class MainGame {
 		{
 		case VICTORY:
 			this.state = GameState.VICTORY;
-			if (!this.custom)
+			if (this.custom)
 			{
 				System.out.println("NO HISCORS FOR YA");
 			} else {
@@ -233,14 +233,11 @@ public class MainGame {
 	{
 		TileState tile_state = tile.getState();
 		
-		System.out.println(this.state + " " + tile_state);
-		
 		if ((this.state != GameState.PLAYING &&
 			this.state != GameState.PRE_GAME) ||
 			tile_state != TileState.NORMAL)
 			return;
-		
-		System.out.println("THIS IS RUNNING");
+
 		tile.trigger();
 		
 		Point coord = tile.getPosition();
@@ -250,6 +247,7 @@ public class MainGame {
 		}
 		else
 		{
+			count_triggered++;
 			if (list_hints.get(coord.y).get(coord.x) == 0)
 			{
 				int x = tile.getPosition().x;
@@ -287,6 +285,12 @@ public class MainGame {
 			else
 			{				
 				tile.setIcon(gui.getTileGrid().getSpritesheet().getSprite("space_" + list_hints.get(coord.y).get(coord.x)));
+			}
+			
+			// TODO: Victory Conditions
+			if (count_triggered == (qt_tile_x * qt_tile_y) - qt_mines)
+			{
+				finish(GameState.VICTORY);
 			}
 		}
 	}
@@ -328,7 +332,7 @@ public class MainGame {
 	       				gui.getTileGrid().getSpritesheet().getSprite("tile_flag"),
 	       				gui.getTileGrid().getSpritesheet().getSprite("tile_question")
 	       			};
-	       			count_flags += tile.toggleFlag(icons);
+	       			count_flags += tile.toggleFlag(count_flags, qt_mines, icons);
 	       		}
 	       	}
 	    }

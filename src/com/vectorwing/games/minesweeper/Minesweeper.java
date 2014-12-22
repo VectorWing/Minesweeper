@@ -15,9 +15,9 @@ import com.vectorwing.games.minesweeper.reference.Names;
  */
 public class Minesweeper extends JFrame {
 
-	private static final long	serialVersionUID = 1L;
-	private MainGUI				gui;
-	private MainGame			game;
+	private static final long		serialVersionUID = 1L;
+	protected MainGUI				gui;
+	protected MainGame				game;
 	
 	public Minesweeper()
 	{

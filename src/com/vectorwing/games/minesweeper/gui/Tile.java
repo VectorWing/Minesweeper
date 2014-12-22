@@ -49,16 +49,24 @@ public class Tile extends JButton {
 			this.state = TileState.TRIGGERED;
 	}
 	
-	/** Modifies the tile's state between NORMAL, FLAGGED and QUESTION, in this order, unless TRIGGERED. 
-	 * @param icons **/
-	public int toggleFlag(ImageIcon[] icons)
+	/** Modifies the tile's state between NORMAL, FLAGGED and QUESTION, in this order, unless TRIGGERED.
+	 *  Returns an increment for the amount of flags.
+	 **/
+	public int toggleFlag(int flags, int mines, ImageIcon[] icons)
 	{
 		switch (this.state)
 		{
 		case NORMAL:
-			this.state = TileState.FLAGGED;
-			this.setIcon(icons[1]);
-			return 1;
+			if (flags < mines)
+			{
+				this.state = TileState.FLAGGED;
+				this.setIcon(icons[1]);
+				return 1;
+			} else {
+				this.state = TileState.QUESTION;
+				this.setIcon(icons[2]);
+				return 0;
+			}
 		case FLAGGED:
 			this.state = TileState.QUESTION;
 			this.setIcon(icons[2]);
