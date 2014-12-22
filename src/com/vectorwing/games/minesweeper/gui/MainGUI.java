@@ -49,22 +49,22 @@ public class MainGUI extends JPanel {
 		
 		this.game_settings = new GameSettings();
 		game_settings.easyActionListener((e)-> {
-			this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+			/*this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
 			this.tile_grid.newGame(GameLevel.EASY, parent);
 			this.game_info.setParameters(GameLevel.EASY);
-			this.game_info.setClear();
+			this.game_info.setClear();*/
 		});
 		game_settings.mediumActionListener((e)-> {
-			this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+			/*this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
 			this.tile_grid.newGame(GameLevel.MEDIUM, parent);
 			this.game_info.setParameters(GameLevel.MEDIUM);
-			this.game_info.setClear();
+			this.game_info.setClear();*/
 		});
 		game_settings.hardActionListener((e)-> {
-			this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+			/*this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
 			this.tile_grid.newGame(GameLevel.HARD, parent);
 			this.game_info.setParameters(GameLevel.HARD);
-			this.game_info.setClear();
+			this.game_info.setClear();*/
 		});
 		game_settings.customActionListener((e)-> {
 			this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -75,10 +75,10 @@ public class MainGUI extends JPanel {
 			
 			if (result == 0)
 			{
-				int[] values = custom_game.getCustomValues();
+				/*int[] values = custom_game.getCustomValues();
 				this.tile_grid.newGame(values[0], values[1], values[2], parent);
 				this.game_info.setParameters(0, values[2], 0, (values[0]*values[1])-values[2]);
-				this.game_info.setClear();
+				this.game_info.setClear();*/
 			}
 		});		
 		
@@ -92,8 +92,8 @@ public class MainGUI extends JPanel {
 		gbc.insets = new Insets(0, 24, 24, 24);
 		this.add(game_info, gbc);
 		
-		/*this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-		this.tile_grid.newGame(GameDifficulty.EASY, parent);
+		this.parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+		/*this.tile_grid.newGame(GameDifficulty.EASY, parent);
 		this.game_info.setParameters(GameDifficulty.EASY);
 		this.game_info.setClear();*/
 	}

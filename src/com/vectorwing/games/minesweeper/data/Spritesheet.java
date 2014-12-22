@@ -3,28 +3,27 @@ package com.vectorwing.games.minesweeper.data;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 
-public class Spritesheet {
+public class Spritesheet extends HashMap<String, ImageIcon> {
 	
-	private Map<String, ImageIcon> sheet;
-	
+	private static final long serialVersionUID = 1L;
+
 	public Spritesheet()
 	{
-		sheet = new HashMap<String, ImageIcon>(); 
+		//
 	}
 	
 	public ImageIcon getSprite(String name)
 	{
-		return sheet.get(name);
+		return this.get(name);
 	}
 	
 	/** Inserts a new sprite manually, identified by the given name. **/
 	public void add(BufferedImage img, String name)
 	{
-		this.sheet.put(name, new ImageIcon(img));
+		this.put(name, new ImageIcon(img));
 	}
 	
 	/**
@@ -36,7 +35,7 @@ public class Spritesheet {
 	public void generateSpritesFromImage(BufferedImage img, ArrayList<String> names,
 			int sprite_width, int sprite_height, int sprite_cols, int sprite_rows)
 	{
-		this.sheet.clear();
+		this.clear();
 		int index = 0;
 		
 		for (int i = 0; i < sprite_rows; i++)
@@ -51,7 +50,7 @@ public class Spritesheet {
 		    		key = "sprite_" + String.valueOf(index);
 		    		
 		    	ImageIcon icon = new ImageIcon(img.getSubimage(j * sprite_width, i * sprite_height, sprite_width, sprite_height));
-		    	this.sheet.put(key, icon);
+		    	this.put(key, icon);
 		    	index++;
 		    }
 		}

@@ -15,6 +15,9 @@ public class Measures {
 	public static final int	MAX_TILE_Y = 32;
 	
 	/** The percentage of mine tiles allowed per field. **/
-	public static final double MAX_TILE_MINES = 0.6;
+	public static final double MAX_TILE_MINES = 999;
+	
+	/** The percentage of mine tiles allowed per field. **/
+	public static final double MAX_PERCENT_MINES = 0.6;
 
 }

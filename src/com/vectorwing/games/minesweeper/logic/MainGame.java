@@ -4,56 +4,47 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.Timer;
 
-import com.vectorwing.games.minesweeper.data.Spritesheet;
 import com.vectorwing.games.minesweeper.enums.GameLevel;
 import com.vectorwing.games.minesweeper.enums.GameState;
 import com.vectorwing.games.minesweeper.enums.TileState;
 import com.vectorwing.games.minesweeper.gui.MainGUI;
 import com.vectorwing.games.minesweeper.gui.Tile;
-import com.vectorwing.games.minesweeper.gui.TileGrid;
-import com.vectorwing.games.minesweeper.gui.Tile.TileFrame;
-import com.vectorwing.games.minesweeper.reference.Filepath;
 import com.vectorwing.games.minesweeper.reference.Measures;
 
 /**
  * Stores the overall logic for a round of Minesweeper.
  */
 public class MainGame {
-	
-	public static final int MINE = -1;
-	
+
 	// Widgets
 	private MainGUI							gui;
 	private GameLevel						level;
 	
 	// Arrays
 	private ArrayList<ArrayList<Integer>>	list_hints;
-	private ArrayList<ArrayList<Boolean>>	list_mines;	
+	private ArrayList<ArrayList<Boolean>>	list_mines;
 	
 	// Game Data
 	private GameState						state;
+	private Timer							timer;
 	private int								qt_tile_x;
 	private int								qt_tile_y;
 	private int								qt_mines;
 	private int								count_flags;
-	//private Timer							count_time;
+	private int								count_time;
 	private int								count_triggered;
 	private boolean							custom;
-	
-	private Spritesheet						img_tile;
-	private ArrayList<String>				imgkey_tile;
 	
 	public MainGame(MainGUI gui, GameLevel default_level)
 	{
@@ -62,43 +53,16 @@ public class MainGame {
 		
 		this.list_mines = new ArrayList<ArrayList<Boolean>>();
 		this.list_hints = new ArrayList<ArrayList<Integer>>();
-		this.initGraphics();
-	}
-	
-	@SuppressWarnings("serial")
-	private void initGraphics()
-	{
-		BufferedImage buffer;
 		
-		try {
-			buffer = ImageIO.read(new File(Filepath.IMG_TILE));
-			System.out.println("Resource '" + Filepath.IMG_TILE + "' loaded succesfully.");
-		} catch (IOException e) {
-			System.out.println("ERROR: Failed to load a resource!");
-			buffer = null;
-		}
+		ActionListener action = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				count_time++; 
+				System.out.println(count_time);
+			}  
+		};
+		this.timer = new Timer(1000, action);
 		
-		this.imgkey_tile = new ArrayList<String>()
-		{{
-			add("space_empty");
-			add("space_1");
-			add("space_2");
-			add("space_3");
-			add("space_4");
-			add("space_mine");
-			add("space_5");
-			add("space_6");
-			add("space_7");
-			add("space_8");
-			add("tile_normal");
-			add("tile_flag");
-			add("tile_question");
-			add("tile_clicking");
-			add("error");
-		}};
-		
-		this.img_tile = new Spritesheet();
-		this.img_tile.generateSpritesFromImage(buffer, imgkey_tile, 24, 24, 5, 3);
+		this.begin();
 	}
 	
 	public void printGameInfo()
@@ -106,7 +70,7 @@ public class MainGame {
 		System.out.println(count_flags + "/" + count_triggered);
 	}
 	
-	/** Sets one of the default game modes. Those have high-scores. **/
+	/** Sets one of the default game modes. Those hold high-scores. **/
 	public void setNormalGame(GameLevel level)
 	{
 		this.custom = false;
@@ -137,6 +101,7 @@ public class MainGame {
 		this.list_mines.clear();
 		this.list_hints.clear();
 		this.count_flags = 0;
+		this.count_time = 0;
 		this.count_triggered = 0;
 		
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -147,11 +112,14 @@ public class MainGame {
 			ArrayList<Boolean> minerow = new ArrayList<Boolean>(Collections.nCopies(qt_tile_x, false));
 			this.list_mines.add(minerow);
 			
+			ArrayList<Integer> hintrow = new ArrayList<Integer>(Collections.nCopies(qt_tile_x, 0));
+			this.list_hints.add(hintrow);
+			
 			gbc.gridy = iter_y;
 			ArrayList<Tile> tilerow = new ArrayList<Tile>();
 			for (int iter_x = 0; iter_x < this.qt_tile_x; iter_x++)
 			{
-				Tile tile = new Tile(iter_x, iter_y, img_tile.getSprite("TILE_NORMAL"));
+				Tile tile = new Tile(iter_x, iter_y, gui.getTileGrid().getSpritesheet().getSprite("tile_normal"));
 				tile.setPreferredSize(new Dimension(Measures.TILE_WIDTH, Measures.TILE_HEIGHT));
 				tile.addMouseListener(new TileMouseAdapter(tile));
 				tilerow.add(tile);
@@ -161,6 +129,9 @@ public class MainGame {
 			}
 			gui.getTileGrid().getTileArray().add(tilerow);
 		}
+		
+		this.timer.restart();
+		this.timer.start();
 	}
 	
 	/** Ends the current game under the given state. If not VICTORY or DEFEAT, nothing happens. **/
@@ -169,10 +140,12 @@ public class MainGame {
 		if (this.state != GameState.PLAYING)
 			return;
 		
+		this.timer.stop();
+		
 		switch (final_state)
 		{
 		case VICTORY:
-			// TODO: Congratulate player and attempt high-score update.
+			this.state = GameState.VICTORY;
 			if (!this.custom)
 			{
 				System.out.println("NO HISCORS FOR YA");
@@ -190,7 +163,7 @@ public class MainGame {
 				for (boolean isMine : row)
 				{
 					if (isMine)
-						this.gui.getTileGrid().getTileArray().get(y).get(x).setIcon(img_tile.getSprite("space_mine"));
+						this.gui.getTileGrid().updateTileGraphics(x, y, "space_mine");
 					x++;
 				}
 				y++;
@@ -225,24 +198,24 @@ public class MainGame {
 			}
 			
 			if (row > 0) {
-				this.list_hints.get(row-1).set(col, this.list_hints.get(row-1).get(col) + 1);
+				this.list_hints.get(row-1).set(col, (int)this.list_hints.get(row-1).get(col) + 1);
 				if (col > 0) 
-					this.list_hints.get(row-1).set(col-1, this.list_hints.get(row-1).get(col-1) + 1);
+					this.list_hints.get(row-1).set(col-1, (int)this.list_hints.get(row-1).get(col-1) + 1);
 				if (col < qt_tile_x-1)
-					this.list_hints.get(row-1).set(col+1, this.list_hints.get(row-1).get(col+1) + 1);
+					this.list_hints.get(row-1).set(col+1, (int)this.list_hints.get(row-1).get(col+1) + 1);
 			}
 			if (row < qt_tile_y-1) {
-				this.list_hints.get(row+1).set(col, this.list_hints.get(row-1).get(col) + 1);
+				this.list_hints.get(row+1).set(col, (int)this.list_hints.get(row+1).get(col) + 1);
 				if (col > 0)
-					this.list_hints.get(row+1).set(col-1, this.list_hints.get(row-1).get(col-1) + 1);
+					this.list_hints.get(row+1).set(col-1, (int)this.list_hints.get(row+1).get(col-1) + 1);
 				if (col < qt_tile_x-1)
-					this.list_hints.get(row+1).set(col+1, this.list_hints.get(row-1).get(col+1) + 1);
+					this.list_hints.get(row+1).set(col+1, (int)this.list_hints.get(row+1).get(col+1) + 1);
 			}
 			if (col > 0) {
-				this.list_hints.get(row).set(col-1, this.list_hints.get(row-1).get(col-1) + 1);
+				this.list_hints.get(row).set(col-1, (int)this.list_hints.get(row).get(col-1) + 1);
 			}
 			if (col < qt_tile_x-1) {
-				this.list_hints.get(row).set(col+1, this.list_hints.get(row-1).get(col+1) + 1 );
+				this.list_hints.get(row).set(col+1, (int)this.list_hints.get(row).get(col+1) + 1 );
 			}
 		}
 	}
@@ -259,26 +232,30 @@ public class MainGame {
 	public void clearTile(Tile tile, boolean cascading)
 	{
 		TileState tile_state = tile.getState();
-		if (this.state != GameState.PLAYING ||
-			this.state != GameState.PRE_GAME ||
+		
+		System.out.println(this.state + " " + tile_state);
+		
+		if ((this.state != GameState.PLAYING &&
+			this.state != GameState.PRE_GAME) ||
 			tile_state != TileState.NORMAL)
 			return;
 		
+		System.out.println("THIS IS RUNNING");
 		tile.trigger();
 		
 		Point coord = tile.getPosition();
 		if (!cascading && list_mines.get(coord.y).get(coord.x))
 		{
-			// All mines are displayed on game over.
 			this.finish(GameState.DEFEAT);
 		}
 		else
 		{
 			if (list_hints.get(coord.y).get(coord.x) == 0)
 			{
-				tile.setIcon(img_tile.getSprite("space_empty"));
 				int x = tile.getPosition().x;
 				int y = tile.getPosition().y;
+				gui.getTileGrid().updateTileGraphics(x, y, "space_empty");
+				
 				ArrayList<ArrayList<Tile>> grid = this.gui.getTileGrid().getTileArray();
 				
 				if (y > 0)
@@ -309,7 +286,7 @@ public class MainGame {
 			}
 			else
 			{				
-				tile.setIcon(img_tile.getSprite("space_" + list_hints.get(coord.y).get(coord.x)));
+				tile.setIcon(gui.getTileGrid().getSpritesheet().getSprite("space_" + list_hints.get(coord.y).get(coord.x)));
 			}
 		}
 	}
@@ -330,7 +307,8 @@ public class MainGame {
 				state != GameState.DEFEAT &&
 				state != GameState.VICTORY)
 			{
-				tile.setIcon(img_tile.getSprite("TILE_CLICKING"));
+				Point pos = tile.getPosition();
+				gui.getTileGrid().updateTileGraphics(pos.x, pos.y, "tile_clicking");
 			}
 		}
 	    public void mouseReleased(MouseEvent e) {
@@ -345,7 +323,12 @@ public class MainGame {
 	       		{
 	       			clearTile(tile, false);
 	       		} else {
-	       			count_flags += tile.toggleFlag();
+	       			ImageIcon[] icons = {
+	       				gui.getTileGrid().getSpritesheet().getSprite("tile_normal"),
+	       				gui.getTileGrid().getSpritesheet().getSprite("tile_flag"),
+	       				gui.getTileGrid().getSpritesheet().getSprite("tile_question")
+	       			};
+	       			count_flags += tile.toggleFlag(icons);
 	       		}
 	       	}
 	    }

@@ -38,9 +38,14 @@ public class Minesweeper extends JFrame {
 		this.gui = new MainGUI();
 		this.setContentPane(this.gui);
 		
-		this.gui.getTileGrid().newGame(GameLevel.EASY, this);
+		this.game = new MainGame(gui, GameLevel.EASY);
+		
+		/*this.gui.getTileGrid().newGame(GameLevel.EASY, this);
 		this.gui.getGameInfo().setParameters(GameLevel.EASY);
-		this.gui.getGameInfo().setClear();
+		this.gui.getGameInfo().setClear();*/
+		
+		this.game.begin();
+		
 		this.pack();
 	}
 
