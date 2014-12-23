@@ -10,8 +10,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import com.vectorwing.games.minesweeper.enums.GameLevel;
-
 /**
  * The main container for Minesweeper's frame.
  */

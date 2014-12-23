@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import com.vectorwing.games.minesweeper.data.Spritesheet;
+import com.vectorwing.games.minesweeper.data.Tile;
 import com.vectorwing.games.minesweeper.reference.Filepath;
 
 /**

@@ -1,4 +1,4 @@
-package com.vectorwing.games.minesweeper.gui;
+package com.vectorwing.games.minesweeper.data;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;

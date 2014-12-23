@@ -15,11 +15,11 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
+import com.vectorwing.games.minesweeper.data.Tile;
 import com.vectorwing.games.minesweeper.enums.GameLevel;
 import com.vectorwing.games.minesweeper.enums.GameState;
 import com.vectorwing.games.minesweeper.enums.TileState;
 import com.vectorwing.games.minesweeper.gui.MainGUI;
-import com.vectorwing.games.minesweeper.gui.Tile;
 import com.vectorwing.games.minesweeper.reference.Measures;
 
 /**
@@ -64,11 +64,6 @@ public class MainGame {
 		
 		this.begin();
 	}
-	
-	/*public void printGameInfo()
-	{
-		System.out.println(count_flags + "/" + count_triggered);
-	}*/
 	
 	/** Sets one of the default game modes. Those hold high-scores. **/
 	public void setNormalGame(GameLevel level)
@@ -283,14 +278,13 @@ public class MainGame {
 				return;
 			}
 			else
-			{				
+			{
 				tile.setIcon(gui.getTileGrid().getSpritesheet().getSprite("space_" + list_hints.get(coord.y).get(coord.x)));
 			}
 			
-			// TODO: Victory Conditions
 			if (count_triggered == (qt_tile_x * qt_tile_y) - qt_mines)
 			{
-				finish(GameState.VICTORY);
+				this.finish(GameState.VICTORY);
 			}
 		}
 	}
